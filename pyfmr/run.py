@@ -13,8 +13,7 @@ fmr.init_grammar(g)
 
 strs = ["直辖市：北京、上海、天津","直辖市：帝都、津城、魔都"]
 
-for i in strs:
-    l = c(i)
-    ret = fmr.extract(l, s)
+for l in strs:
+    ret = fmr.extract(c(l), s)
     value = ctypes.cast(ret, ctypes.c_char_p).value
     print(value.decode('utf-8'))
