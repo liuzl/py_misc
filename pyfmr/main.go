@@ -2,23 +2,33 @@ package main
 
 import (
 	"C"
+	"fmt"
+
 	"github.com/liuzl/fmr"
 )
 
-func Sum(a, b int) int {
-	return a + b
+var g *fmr.Grammar
+
+//export Hello
+func Hello(n string) {
+	fmt.Println("hello, ", n)
 }
 
-//export GrammarFromFile
-func GrammarFromFile(f string) *fmr.Grammar {
-	g, err := fmr.GrammarFromFile(f)
+//export InitGrammar
+func InitGrammar(f string) {
+	var err error
+	g, err = fmr.GrammarFromFile("sf.grammar")
 	if err != nil {
+		fmt.Println(f, " ", err.Error())
 		panic(err)
 	}
-	return g
+	fmt.Printf("grammar file loaded from %s\n", f)
 }
 
-func Extract(g *fmr.Grammar, line, start string) []string {
+//export Extract
+func Extract(line, start string) []string {
+	line = "直辖市：北京、上海、天津"
+	start = "cities"
 	trees, err := g.ExtractMaxAll(line, start)
 	if err != nil {
 		return []string{err.Error()}
@@ -36,5 +46,7 @@ func Extract(g *fmr.Grammar, line, start string) []string {
 }
 
 func main() {
-	GrammarFromFile("sf.grammar")
+	if g == nil {
+		fmt.Println("g is nil")
+	}
 }
