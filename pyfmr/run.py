@@ -1,8 +1,20 @@
 import ctypes
 fmr = ctypes.CDLL('./fmr.so')
-g = ctypes.create_string_buffer("./sf.grammar".encode('utf-8'))
-l = ctypes.create_string_buffer("直辖市：北京、上海、天津".encode('utf-8'))
-s = ctypes.create_string_buffer("cities".encode('utf-8'))
+charptr = ctypes.POINTER(ctypes.c_char)
+
+fmr.extract.restype = charptr
+
+def c(s): return ctypes.create_string_buffer(s.encode('utf-8'))
+
+g = c("./sf.grammar")
+s = c("cities")
+
 fmr.init_grammar(g)
-ret = fmr.extract(l, s)
-print(type(ret))
+
+strs = ["直辖市：北京、上海、天津","直辖市：帝都、津城、魔都"]
+
+for i in strs:
+    l = c(i)
+    ret = fmr.extract(l, s)
+    value = ctypes.cast(ret, ctypes.c_char_p).value
+    print(value.decode('utf-8'))
