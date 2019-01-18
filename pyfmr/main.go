@@ -9,15 +9,12 @@ import (
 
 var g *fmr.Grammar
 
-//export Hello
-func Hello(n string) {
-	fmt.Println("hello, ", n)
-}
-
-//export InitGrammar
-func InitGrammar(f string) {
+//export init_grammar
+func init_grammar(s *C.char) {
+	f := C.GoString(s)
+	fmt.Println(f)
 	var err error
-	g, err = fmr.GrammarFromFile("sf.grammar")
+	g, err = fmr.GrammarFromFile(f)
 	if err != nil {
 		fmt.Println(f, " ", err.Error())
 		panic(err)
@@ -25,28 +22,30 @@ func InitGrammar(f string) {
 	fmt.Printf("grammar file loaded from %s\n", f)
 }
 
-//export Extract
-func Extract(line, start string) []string {
-	line = "直辖市：北京、上海、天津"
-	start = "cities"
+//export extract
+func extract(l, s *C.char) *C.char {
+	//line = "直辖市：北京、上海、天津"
+	//start = "cities"
+	line := C.GoString(l)
+	start := C.GoString(s)
+	fmt.Println("extract")
 	trees, err := g.ExtractMaxAll(line, start)
 	if err != nil {
-		return []string{err.Error()}
+		fmt.Println(err.Error())
+		return C.CString(err.Error())
 	}
-	var ret []string
 	for _, tree := range trees {
 		sem, err := tree.Semantic()
 		if err != nil {
-			ret = append(ret, err.Error())
+			fmt.Println(err.Error())
+			return C.CString(err.Error())
 		} else {
-			ret = append(ret, sem)
+			fmt.Println(sem)
+			return C.CString(sem)
 		}
 	}
-	return ret
+	return C.CString("no result")
 }
 
 func main() {
-	if g == nil {
-		fmt.Println("g is nil")
-	}
 }
