@@ -11,7 +11,11 @@ s = c("cities")
 
 fmr.init_grammar(g)
 
-strs = ["直辖市：北京、上海、天津","直辖市：帝都、津城、魔都"]
+strs = [
+    "直辖市：北京、上海、天津",
+    "直辖市：帝都、津城、魔都",
+    "中国现在有四个直辖市：帝都、魔都、天津、重庆。",
+]
 
 for l in strs:
     ret = fmr.extract(c(l), s)
