@@ -1,8 +1,13 @@
 package main
 
+/*
+#include <stdlib.h>
+*/
+import "C"
+
 import (
-	"C"
 	"fmt"
+	"unsafe"
 
 	"github.com/liuzl/fmr"
 )
@@ -27,18 +32,26 @@ func extract(l, s *C.char) *C.char {
 	start := C.GoString(s)
 	trees, err := g.ExtractMaxAll(line, start)
 	if err != nil {
-		return C.CString(err.Error())
+		cs := C.CString(err.Error())
+		C.free(unsafe.Pointer(cs))
+		return cs
 	}
 	for _, tree := range trees {
 		sem, err := tree.Semantic()
 		if err != nil {
-			return C.CString(err.Error())
+			cs := C.CString(err.Error())
+			C.free(unsafe.Pointer(cs))
+			return cs
 		} else {
 			// return the first one
-			return C.CString(sem)
+			cs := C.CString(sem)
+			C.free(unsafe.Pointer(cs))
+			return cs
 		}
 	}
-	return C.CString("no result")
+	cs := C.CString("no result")
+	C.free(unsafe.Pointer(cs))
+	return cs
 }
 
 func main() {
