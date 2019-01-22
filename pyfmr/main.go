@@ -32,26 +32,23 @@ func extract(l, s *C.char) *C.char {
 	start := C.GoString(s)
 	trees, err := g.ExtractMaxAll(line, start)
 	if err != nil {
-		cs := C.CString(err.Error())
-		C.free(unsafe.Pointer(cs))
-		return cs
+		return C.CString(err.Error())
 	}
 	for _, tree := range trees {
 		sem, err := tree.Semantic()
 		if err != nil {
-			cs := C.CString(err.Error())
-			C.free(unsafe.Pointer(cs))
-			return cs
+			return C.CString(err.Error())
 		} else {
 			// return the first one
-			cs := C.CString(sem)
-			C.free(unsafe.Pointer(cs))
-			return cs
+			return C.CString(sem)
 		}
 	}
-	cs := C.CString("no result")
+	return C.CString("no result")
+}
+
+//export gofree
+func gofree(cs *C.char) {
 	C.free(unsafe.Pointer(cs))
-	return cs
 }
 
 func main() {
