@@ -23,7 +23,7 @@ func init_grammar(s *C.char) {
 		fmt.Println(f, " ", err.Error())
 		panic(err)
 	}
-	fmt.Printf("grammar file loaded from %s\n", f)
+	//fmt.Printf("grammar file loaded from %s\n", f)
 }
 
 //export extract

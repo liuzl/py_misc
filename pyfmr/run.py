@@ -22,4 +22,4 @@ for l in strs:
     ret = fmr.extract(c(l), s)
     value = ctypes.cast(ret, ctypes.c_char_p).value
     fmr.gofree(ret)
-    print("ret:",value.decode('utf-8'))
+    print(value.decode('utf-8'))
