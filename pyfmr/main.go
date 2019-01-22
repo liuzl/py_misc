@@ -34,6 +34,7 @@ func extract(l, s *C.char) *C.char {
 		if err != nil {
 			return C.CString(err.Error())
 		} else {
+			// return the first one
 			return C.CString(sem)
 		}
 	}
