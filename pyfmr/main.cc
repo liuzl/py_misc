@@ -11,5 +11,6 @@ int main(int argc, char *argv[])
     init_grammar(argv[1]);
     char *ret = extract(argv[3], argv[2]);
     printf("%s\n",ret);
+    gofree(ret);
     return 0;
 }

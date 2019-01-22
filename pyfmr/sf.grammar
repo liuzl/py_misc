@@ -17,8 +17,8 @@
        | `.(?:城|都)`
        ;
 
-<city_ext> = <city>            {nf.I($1)}
-           | (any{1,1}) <city> {nf.I($2)}
+<city_ext> = <city>            {fmr.entity($@)}//{nf.I($1)}
+           | (any{1,1}) <city> {fmr.entity($@)}//{nf.I($2)}
            ;
 
 <cities> = "直辖市：" (list<city_ext>) {fmr.entity($@)};//{nf.I($2)};
