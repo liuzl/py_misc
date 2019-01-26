@@ -4,8 +4,8 @@ import sys
 
 
 class Mail(object):
-    user = 'timest@example.com'
-    password = 'password'
+    user = ''
+    password = ''
     imap = 'imap.exmail.qq.com'
 
     def __init__(self, u, p):
@@ -48,7 +48,7 @@ class Mail(object):
         print("Date: ", msg['Date'])
 
     def parse_part_to_str(self, part):
-        charset = part.get_charset() or 'gb2312'
+        charset = part.get_charset() or 'utf-8'
         payload = part.get_payload(decode=True)
         if not payload:
             return
@@ -70,7 +70,7 @@ class Mail(object):
 
 
     def parse(self):
-        nums = self.all[300:301]
+        nums = self.all[10:12]
         for num in nums:
             try:
                 result, data = self.conn.fetch(num, '(RFC822)')
