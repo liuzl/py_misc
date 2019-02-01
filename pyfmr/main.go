@@ -7,6 +7,8 @@ import "C"
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 	"sync"
 	"unsafe"
 
@@ -44,48 +46,29 @@ func init_grammar(s *C.char) int {
 	return i
 }
 
-//export extract
-func extract(l, s *C.char) *C.char {
-	line := C.GoString(l)
-	start := C.GoString(s)
-	trees, err := g.ExtractMaxAll(line, start)
-	if err != nil {
-		return C.CString(err.Error())
-	}
-	for _, tree := range trees {
-		sem, err := tree.Semantic()
-		if err != nil {
-			return C.CString(err.Error())
-		} else {
-			// return the first one
-			return C.CString(sem)
-		}
-	}
-	return C.CString("null")
-}
-
 //export extractx
 func extractx(i int, l, s *C.char) *C.char {
 	if i < 0 || i >= len(grammars) {
-		return C.CString("no grammar")
+		return C.CString(`{"error":"no grammar"}`)
 	}
 	lg := grammars[i]
 	line := C.GoString(l)
 	start := C.GoString(s)
 	trees, err := lg.ExtractMaxAll(line, start)
 	if err != nil {
-		return C.CString(err.Error())
+		return C.CString(`{"error":` + strconv.Quote(err.Error()) + `}`)
 	}
+	var ret []string
 	for _, tree := range trees {
 		sem, err := tree.Semantic()
 		if err != nil {
-			return C.CString(err.Error())
+			return C.CString(`{"error":` + strconv.Quote(err.Error()) + `}`)
 		} else {
-			// return the first one
-			return C.CString(sem)
+			ret = append(ret, sem)
 		}
 	}
-	return C.CString("null")
+	//return C.CString("null")
+	return C.CString(`[` + strings.Join(ret, ",") + `]`)
 }
 
 //export gofree

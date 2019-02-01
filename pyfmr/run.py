@@ -2,7 +2,6 @@ import ctypes
 fmr = ctypes.CDLL('./fmr.so')
 charptr = ctypes.POINTER(ctypes.c_char)
 
-fmr.extract.restype = charptr
 fmr.extractx.restype = charptr
 
 def c(s): return ctypes.create_string_buffer(s.encode('utf-8'))
