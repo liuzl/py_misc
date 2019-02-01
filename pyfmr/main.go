@@ -61,7 +61,7 @@ func extract(l, s *C.char) *C.char {
 			return C.CString(sem)
 		}
 	}
-	return C.CString("no result")
+	return C.CString("null")
 }
 
 //export extractx
@@ -85,7 +85,7 @@ func extractx(i int, l, s *C.char) *C.char {
 			return C.CString(sem)
 		}
 	}
-	return C.CString("no result")
+	return C.CString("null")
 }
 
 //export gofree
