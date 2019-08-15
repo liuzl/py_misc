@@ -8,5 +8,11 @@ sentence = Sentence('I love Berlin .')
 tagger = SequenceTagger.load('ner')
 
 # run NER over sentence
-ret = tagger.predict(sentence)
-print(ret)
+tagger.predict(sentence)
+
+print(sentence)
+print('The following NER tags are found:')
+
+# iterate over entities and print
+for entity in sentence.get_spans('ner'):
+    print(entity)
