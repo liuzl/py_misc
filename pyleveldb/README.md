@@ -1,0 +1,3 @@
+```sh
+pip install leveldb
+```
