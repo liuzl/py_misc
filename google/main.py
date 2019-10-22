@@ -3,6 +3,7 @@ import lxml
 import lxml.html
 import datetime
 import json
+from tqdm import tqdm
 
 common_headers = {
 'Connection': 'keep-alive',
@@ -35,8 +36,10 @@ def extract(page):
         item = {"title": title, "url": link, "snippet": snippet, "time": time, "now":str(now)}
         yield item
 
-out = open("google.json", "a")
+out = open("google1.json", "a")
+t = tqdm(total=187)
 for i in range(187):
+    t.update(1)
     url = url_ + "%d"%i
     res = requests.get(url, headers=common_headers)
     for item in extract(res.text):
