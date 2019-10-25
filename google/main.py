@@ -40,7 +40,7 @@ out = open("google1.json", "a")
 t = tqdm(total=187)
 for i in range(187):
     t.update(1)
-    url = url_ + "%d"%i
+    url = url_ + "%d"%(i*10)
     res = requests.get(url, headers=common_headers)
     for item in extract(res.text):
         line = json.dumps(item, ensure_ascii=False)
