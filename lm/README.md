@@ -16,6 +16,11 @@ make -j 4
 # ./bin/count_ngrams
 ```
 
+### 下载THUCNews中文文本数据集
+
+* http://thuctc.thunlp.org/
+* [download](https://thunlp.oss-cn-qingdao.aliyuncs.com/THUCNews.zip)
+
 ## 参考资料
 
 * [KenLM: Faster and Smaller Language Model Queries](https://github.com/kpu/kenlm)
