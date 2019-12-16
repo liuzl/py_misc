@@ -15,15 +15,16 @@ class AddrParser(object):
 
     def address(self, code):
         code = "{}".format(code).strip()
-        if len(code) == 0:
-            raise KeyError("Empty code")
-        ret = {}
         l = len(code)
+        if l == 0: raise KeyError("Empty code")
+        ret = {}
         for key in keys:
             if codelens[key] > l: break
-            name = self.code2name[code[:codelens[key]]]
-            if name == b'': break
-            ret[key] = name.decode("utf-8")
+            try:
+                name = self.code2name[code[:codelens[key]]]
+                ret[key] = name.decode("utf-8")
+            except KeyError as e:
+                break
         return ret
 
     def parse(self, text):
