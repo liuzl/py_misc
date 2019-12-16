@@ -1,5 +1,4 @@
 import gzip
-import json
 import pydict
 import lsm
 from tqdm import tqdm
