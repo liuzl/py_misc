@@ -1,6 +1,7 @@
 import gzip
 import json
 import pydict
+import lsm
 from tqdm import tqdm
 
 codelen = {2:"province", 4:"city", 6:"county", 9:"town", 12:"village"}
@@ -25,9 +26,26 @@ def process(infile):
     db.save()
     pbar.close()
 
+def kv(infile):
+    if infile.endswith(".gz"): fp = gzip.open(infile, 'rt')
+    else: fp = open(infile, 'rt')
+    db = lsm.LSM("addrdb/code.ldb")
+    lines = fp.read().strip().split("\n")
+    pbar = tqdm(total=len(lines))
+    for line in lines:
+        pbar.update(1)
+        item = line.strip().split('\t')
+        if len(item) != 2:
+            print("err line: %s" % line.strip())
+            continue
+        db[item[0]] = item[1].split(',')[0]
+    pbar.close()
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) < 2:
         print("Usage: python %s <in_file>" % sys.argv[0])
         sys.exit(1)
     process(sys.argv[1])
+    kv(sys.argv[1])
+
