@@ -42,5 +42,7 @@ class Duckling(object):
 
 if __name__ == "__main__":
     duckling = Duckling()
-    ret = duckling("我打算明天下午三点去清华智源中心，可能需要开车十五公里")
-    print(ret)
+    text = "我打算明天下午三点去清华智源中心，可能需要开车十五公里"
+    ret = duckling(text)
+    import json
+    print(json.dumps(ret, ensure_ascii=False))
