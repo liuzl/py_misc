@@ -1,4 +1,5 @@
 from playwright.sync_api import sync_playwright
+import time
 
 def run(playwright):
     browser = playwright.chromium.launch(headless=True)
@@ -16,7 +17,7 @@ def run(playwright):
 
     # Press Enter
     page.press("textarea[placeholder=\"请输入您的问题，Shift+Enter换行\"]", "Enter")
-
+    time.sleep(2)
     page.screenshot(path="name.png")
     # ---------------------
     context.close()
