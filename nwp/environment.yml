@@ -1,0 +1,73 @@
+name: herbie
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.10
+  - pip
+
+  #==============
+  # Dependencies
+  #==============
+  - cartopy>=0.20.3
+  - cfgrib>=0.9.10.1
+  - matplotlib>=3.5.3
+  - metpy
+  - numpy
+  - pandas
+  - pygrib
+  - requests
+  - toml
+  - xarray>=2022.6.0
+
+  #====================
+  # Other Dependencies
+  #====================
+  - curl
+  - eccodes # required by cfgrib
+  - geos # required by cartopy
+  - proj # required by cartopy
+  #- wgrib2 # ONLY AVAILABLE ON LINUX. Uncomment if you want this optional dependency.
+
+  #================
+  # Optional Tools
+  #================
+  - black
+  - black-jupyter
+  - jupyter
+  - jupyterlab
+  - pytest
+  #- rclone # Not used by Herbie, but is an awesome alternative (https://rclone.org/)
+
+  - pip:
+      # Install last published version on PyPi
+      #- herbie-data
+
+      # ~~ or ~~
+
+      # Install most recent changes from GitHub
+      - git+https://github.com/blaylockbk/Herbie.git
+
+      # Borrow some tools from my garage
+      - git+https://github.com/blaylockbk/Carpenter_Workshop.git
+###############################################################################
+#
+# Note: Being more specific with versions *may* help speed up conda
+# creating/updating environments
+# https://www.anaconda.com/blog/understanding-and-improving-condas-performance
+#
+###############################################################################
+#
+# To create this environment
+#
+#     wget https://github.com/blaylockbk/Herbie/raw/main/environment.yml
+#     conda env create -f environment.yml
+#
+# To update this environment
+#
+#     conda env update -f environment.yml --prune
+#
+# To remove this environment
+#
+#     conda env remove --name herbie
+#
+###############################################################################
