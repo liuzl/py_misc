@@ -1,0 +1,7 @@
+fitz
+numpy
+openai
+gradio
+scikit-learn
+PyMuPDF
+sentence-transformers
