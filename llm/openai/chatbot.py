@@ -66,4 +66,20 @@ def chat(prompt):
     print(response)
     return response
 
-chat("Hi, I'd like to order a pizza")
+#chat("Hi, I'd like to order a pizza")
+
+import gradio as gr
+
+with gr.Blocks() as demo:
+    chatbot = gr.Chatbot()
+    msg = gr.Textbox()
+
+    def respond(message, chat_history):
+        bot_message = chat(message)
+        chat_history.append((message, bot_message))
+        return "", chat_history
+
+    msg.submit(respond, [msg, chatbot], [msg, chatbot])
+
+if __name__ == "__main__":
+    demo.launch()
