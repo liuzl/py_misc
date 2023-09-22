@@ -47,7 +47,7 @@ more detailed and relevant outputs.
 """
 prompt = f"""
 Summarize the text delimited by triple backticks \
-into a single sentence.
+into a single sentence. The response should be in Chinese.
 ```{text}```
 """
 response = get_completion(prompt)
