@@ -8,7 +8,7 @@ print(g4f.Provider.Ails.params)  # supported args
 # streamed completion
 response = g4f.ChatCompletion.create(
     model="gpt-3.5-turbo",
-    messages=[{"role": "user", "content": "Hello world"}],
+    messages=[{"role": "user", "content": "who are you?"}],
     stream=True,
 )
 
