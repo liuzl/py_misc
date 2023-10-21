@@ -1,3 +1,4 @@
+# encoding: utf-8
 import gradio as gr
 import os
 import openai
@@ -5,8 +6,34 @@ import openai
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-openai.api_base = os.getenv("API_BASE")
-openai.api_key = os.getenv("API_KEY")
+openai.api_base = os.getenv("OPENAI_API_BASE")
+openai.api_key = os.getenv("OPENAI_API_KEY")
+
+from langchain.chains import ConversationChain
+from langchain.chat_models import ChatOpenAI
+from langchain.memory import ConversationSummaryBufferMemory
+from langchain import PromptTemplate
+
+PHONE_CALL_TEMPLATE = open("prompt.txt", encoding="utf-8").read() + """
+
+
+Current conversation:
+{history}
+Human: {input}
+AI:"""
+
+PHONE_CALL_PROMPT = PromptTemplate(
+    input_variables=["history", "input"], template=PHONE_CALL_TEMPLATE
+)
+
+llm = ChatOpenAI(temperature=0.7, model="gpt-3.5-turbo")
+memory = ConversationSummaryBufferMemory(llm=llm, max_token_limit=2048)
+conversation = ConversationChain(
+    llm=llm, 
+    prompt=PHONE_CALL_PROMPT,
+    memory = memory,
+    verbose = True
+)
 
 import gradio as gr 
 import json
@@ -30,7 +57,8 @@ with gr.Blocks() as demo:
     clear = gr.ClearButton([msg, chatbot])
 
     def respond(message, chat_history):
-        chat_history.append((message, message))
+        output = conversation.predict(input=message)
+        chat_history.append((message, output))
         return "", chat_history
 
     msg.submit(respond, [msg, chatbot], [msg, chatbot])
@@ -40,7 +68,9 @@ with gr.Blocks() as demo:
         print(history)
         os.rename(x, x + '.wav')
         history.append(((x + '.wav',), None))
-        history.append((SpeechToText(x + '.wav') ,None))
+        text = SpeechToText(x + '.wav')
+        response = conversation.predict(input=text)
+        history.append((text, response))
         return x + '.wav', history
 
     mic.change(get_chatbot_response, [mic, chatbot], [mic, chatbot])
