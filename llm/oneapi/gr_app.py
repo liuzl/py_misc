@@ -2,6 +2,8 @@
 import gradio as gr
 import os
 import openai
+import requests
+import hashlib
 
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
@@ -14,7 +16,7 @@ from langchain.chat_models import ChatOpenAI
 from langchain.memory import ConversationSummaryBufferMemory
 from langchain import PromptTemplate
 
-PHONE_CALL_TEMPLATE = open("prompt.txt", encoding="utf-8").read() + """
+PHONE_CALL_TEMPLATE = open("call_prompt.txt", encoding="utf-8").read() + """
 
 
 Current conversation:
@@ -71,6 +73,10 @@ with gr.Blocks() as demo:
         text = SpeechToText(x + '.wav')
         response = conversation.predict(input=text)
         history.append((text, response))
+        fname = "./tts/" + hashlib.md5(response.encode('utf-8')).hexdigest() + ".wav"
+        with open(fname, "wb") as out:
+            out.write(requests.get("https://tts.iir.ac.cn/tts", params={"text": response, "voice":"zh-CN-XiaoxiaoNeural"}).content)
+        history.append((None, (fname,)))
         return x + '.wav', history
 
     mic.change(get_chatbot_response, [mic, chatbot], [mic, chatbot])
