@@ -14,25 +14,24 @@ html = """
 var ws = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/ws");
 ws.binaryType = "arraybuffer";  // Important: this ensures the audio data is received as raw binary data
 
-let chunks = [];
+var chunks = [];
 
 
 ws.onmessage = function(event) {
-    console.log("Audio data received from server");
     chunks.push(event.data);
-    console.log(chunks.length);
-    if (chunks.length >= 20) {
+    console.log("Audio data received from server, "+ chunks.length+" chunks");
+    if (chunks.length >= 5) {
         const blob = new Blob(chunks, { 'type' : 'audio/ogg; codecs=opus' });
-        chunks = [];
+        // chunks = [];
         // playAudio(blob);
         
         // 转换Blob为ArrayBuffer
-        const reader = new FileReader();
+        var reader = new FileReader();
         reader.onloadend = function() {
             if (reader.readyState == FileReader.DONE) {
-                const arrayBuffer = reader.result;
+                // const arrayBuffer = reader.result;
                 // 传入ArrayBuffer到您的播放函数
-                playAudio(arrayBuffer);
+                playAudio(reader.result);
             }
         };
         reader.readAsArrayBuffer(blob);
@@ -48,9 +47,10 @@ ws.onclose = function(event) {
 };
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext;
-var audioContext = new AudioContext();
 
 function playAudio(audioData) {
+    var audioContext = new AudioContext();
+    console.log(audioContext.state);
     var audioBufferSourceNode = audioContext.createBufferSource();
 
     // Decode the raw binary data back into an audio buffer
@@ -59,7 +59,7 @@ function playAudio(audioData) {
         audioBufferSourceNode.connect(audioContext.destination);
         audioBufferSourceNode.start(0);  // Play the sound now
     }, function(e) {
-        console.log("Error decoding audio data" + e.err);
+        console.log("Error decoding audio data" + e);
     });
 }
 
@@ -96,7 +96,6 @@ function startRecording() {
 </script>
 
 <button onclick="startRecording()">Start Recording</button>
-<audio id="audio" controls></audio>
 </body>
 </html>
 """
