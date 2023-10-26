@@ -33,12 +33,8 @@ ws.onmessage = function(event) {
 
 function playAudioData() {
     console.log("playAudioData"+audioQueue.length);
-    if (audioQueue.length == 0) {
-        // 没有音频数据，等待一会儿再试
-        setTimeout(playAudioData, 1000);
-        return;
-    }
-    while (audioQueue.length) {
+    
+    if (audioQueue.length > 0) {
         // 获取队列中的下一个音频片段
         const nextBuffer = audioQueue.shift();
 
@@ -56,6 +52,9 @@ function playAudioData() {
             // 当前音频片段播放完毕，继续播放队列中的下一个
             playAudioData();
         };
+    } else {
+        // 没有音频数据，等待一会儿再试
+        setTimeout(playAudioData, 1000);
     }
 }
 
