@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<body>
+<script type="module" src="./webrecorder.js"></script>
+<script>
+var ws = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/ws");
+ws.binaryType = "arraybuffer";  // Important: this ensures the audio data is received as raw binary data
+
+// 音频上下文设置
+const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+// 创建一个用于播放的AudioBufferSourceNode，但不立即连接
+let source = null;
+
+// 用于存储接收到的音频数据的队列
+let audioQueue = [];
+
+
+ws.onmessage = function(event) {
+    // 将ArrayBuffer转换为适合AudioContext处理的Float32Array
+    const inputData = new Int16Array(event.data);
+    const float32AudioData = new Float32Array(inputData.length);
+
+    // 转换 PCM 信号到 [-1,1] 区间的float32数据
+    for (let i = 0; i < inputData.length; i++) {
+        // 除以0x8000（即32768）将Int16Array的PCM数据转换为Float32 [-1,1]
+        float32AudioData[i] = inputData[i] / 0x8000;
+    }
+
+    // 将音频数据推送到队列以供稍后播放
+    audioQueue.push(float32AudioData);
+};
+
+function playAudioData() {
+    console.log("playAudioData"+audioQueue.length);
+    if (audioQueue.length == 0) {
+        // 没有音频数据，等待一会儿再试
+        setTimeout(playAudioData, 1000);
+        return;
+    }
+    while (audioQueue.length) {
+        // 获取队列中的下一个音频片段
+        const nextBuffer = audioQueue.shift();
+
+        // 创建一个能播放该片段的AudioBuffer
+        const audioBuffer = audioCtx.createBuffer(1, nextBuffer.length, 16000);
+        audioBuffer.copyToChannel(nextBuffer, 0);
+
+        // 创建一个新的AudioBufferSourceNode用来播放音频
+        source = audioCtx.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioCtx.destination);
+        source.start(); // 您可以使用 start(0) 立即开始，或指定未来的时间
+
+        source.onended = function() {
+            // 当前音频片段播放完毕，继续播放队列中的下一个
+            playAudioData();
+        };
+
+        // 如果只有一个片段在队列中，我们已经在播放它了，所以跳出循环
+        break;
+    }
+}
+
+ws.onopen = function(event) {
+    console.log("WebSocket is open now.");
+};
+
+ws.onclose = function(event) {
+    console.log("WebSocket is closed now.");
+};
+
+
+
+function startRecording() {
+
+    const recorder = new WebRecorder();
+    recorder.OnReceivedData = (data) => {
+        if (data && data.length > 0) {
+            console.log("Audio data received from recorder, "+ data.length+" bytes");
+            ws.send(data);  // Send audio data to server directly
+        }
+    }
+    recorder.start();
+    console.log("Recording started");
+    playAudioData();
+
+    /*
+    setTimeout(function() {
+        recorder.stop();
+        console.log("Recording stopped");
+    }, 3000);
+    */
+}
+
+</script>
+
+<button onclick="startRecording()">Start Recording</button>
+</body>
+</html>
