@@ -4,11 +4,6 @@ import asyncio
 
 app = FastAPI()
 
-# Embedded HTML content
-html = """
-
-"""
-
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 async def audio_sender(websocket: WebSocket, q: asyncio.Queue):
@@ -18,12 +13,6 @@ async def audio_sender(websocket: WebSocket, q: asyncio.Queue):
             audio = await q.get()
             print("get data from queue")
             await websocket.send_bytes(audio)
-            '''
-            with open("47f48d6928c8fef3c1e35fec2781df8e.mp3", "rb") as file:  # Replace with your audio file path
-                audio_content = file.read()
-            await websocket.send_bytes(audio_content)
-            await asyncio.sleep(30)  # Send every 30 seconds (adjusted for demonstration purposes)
-            '''
         except Exception as e:
             print(f"An error occurred: {e}")
             break  # You might want to handle different exceptions differently
@@ -33,9 +22,7 @@ async def audio_receiver(websocket: WebSocket, q: asyncio.Queue):
         while True:
             data = await websocket.receive_bytes()  # Receive audio data
             print(f"Received audio data: {len(data)} bytes")  # Print the length of the received audio data
-            if True or len(data) == 8721:
-                await q.put(data)
-                print("put data into queue")
+            await q.put(data)
     except WebSocketDisconnect:
         print("Client disconnected.")
     except Exception as e:
