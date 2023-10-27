@@ -32,21 +32,43 @@ ws.onmessage = function(event) {
 };
 
 function playAudioData() {
-    console.log("playAudioData"+audioQueue.length);
+    console.log("playAudioData "+audioQueue.length);
     
     if (audioQueue.length > 0) {
-        // 获取队列中的下一个音频片段
-        const nextBuffer = audioQueue.shift();
 
-        // 创建一个能播放该片段的AudioBuffer
-        const audioBuffer = audioCtx.createBuffer(1, nextBuffer.length, 16000);
-        audioBuffer.copyToChannel(nextBuffer, 0);
+        let allSegments = [];
+        let totalSamples = 0;
 
-        // 创建一个新的AudioBufferSourceNode用来播放音频
-        source = audioCtx.createBufferSource();
-        source.buffer = audioBuffer;
+        // 将队列中的所有音频数据添加到数组中
+        while (audioQueue.length) {
+            let segment = audioQueue.shift();
+            allSegments.push(segment);
+            totalSamples += segment.length;  // 计算总样本长度
+        }
+
+        // 创建一个新的音频缓冲区来容纳所有片段
+        const combinedBuffer = audioCtx.createBuffer(1, totalSamples, 16000);
+
+        // 将所有音频数据复制到大缓冲区中
+        let offset = 0;
+        allSegments.forEach(segment => {
+            combinedBuffer.copyToChannel(segment, 0, offset);
+            offset += segment.length;
+        });
+
+        console.log(allSegments.length+" segments combined into one buffer of "+totalSamples+" samples")
+
+        // 创建一个源来播放合并后的缓冲区
+        const source = audioCtx.createBufferSource();
+        source.buffer = combinedBuffer;
         source.connect(audioCtx.destination);
-        source.start(); // 您可以使用 start(0) 立即开始，或指定未来的时间
+
+        // 设置播放速率（例如，2倍速）
+        source.playbackRate.value = 1.05;
+
+        // 开始播放
+        source.start();
+
 
         source.onended = function() {
             // 当前音频片段播放完毕，继续播放队列中的下一个
