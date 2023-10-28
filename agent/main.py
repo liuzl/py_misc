@@ -22,3 +22,8 @@ config_list = autogen.config_list_from_dotenv(
 )
 
 print(config_list)
+
+assistant = autogen.AssistantAgent("assistant", llm_config={"config_list": config_list})
+user_proxy = autogen.UserProxyAgent("user_proxy", code_execution_config={"work_dir": "coding"})
+# user_proxy.initiate_chat(assistant, message="Plot a chart of NVDA and TESLA stock price change YTD.")
+user_proxy.initiate_chat(assistant, message="今天是农历什么日期？,还有几天过年？请告诉我答案")
