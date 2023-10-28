@@ -2,6 +2,7 @@ import pyaudio
 import threading
 import queue
 import util
+from elevenlabs import play, generate
 
 # 音频录制参数
 FORMAT = pyaudio.paInt16
@@ -30,7 +31,10 @@ def record_audio(queue, stream, frames_per_buffer, stop_event):
 def process_audio_data(combined_data):
     text = util.asr(combined_data)
     print(text)
-    util.play_audio_data(combined_data)
+    # util.play_audio_data(combined_data)
+    # audio = generate(text=text, voice="Bella", model="eleven_multilingual_v2")
+    audio = util.tts(text, voice="zh-CN-XiaoxiaoNeural")
+    play(audio)
 
 def main():
     audio = pyaudio.PyAudio()
@@ -90,6 +94,7 @@ def main():
         stop_event.set()  # 通知录音线程停止
 
     except queue.Empty:
+        print("No audio data in queue.")
         # 超时后，这里可以处理其他事情，如果不需要，可以直接pass
         pass
 
