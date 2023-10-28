@@ -1,0 +1,6 @@
+pyaudio
+numpy
+onnxruntime
+elevenlabs
+openai
+python-dotenv
