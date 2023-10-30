@@ -82,12 +82,6 @@ def main():
                         inactive_count = 0  # 重置非活动计数器
                         process_audio_data(combined_data)
                         
-            
-            if len(active_audio_data) > 1000:
-                combined_data = b''.join(active_audio_data)
-                active_audio_data = []  # 清空缓冲区
-                inactive_count = 0  # 重置非活动计数器
-                process_audio_data(combined_data)
 
     except KeyboardInterrupt:
         print("Stopping recording.")
