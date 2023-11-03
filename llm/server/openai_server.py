@@ -9,29 +9,19 @@ def format_zephyr(
     messages: List[llama_types.ChatCompletionRequestMessage],
     **kwargs: Any,
 ) -> ChatFormatterResponse:
-    _template = {
-        "system": "<|system|>\n{message}</s>\n",
-        "user": "<|user|>\n{message}</s>\n",
-        "assistant": "<|assistant|>\n{message}</s>\n",
-    }
-    
-    _prompt= ""
-    for message in messages:
-        print(message)
-        role = message["role"]
-        if role in _template:
-            _prompt += _template[role].format(message=message["content"])
-    
+    _template = "<|{role}|>\n{message}</s>\n"
+    _prompt = "".join([_template.format(role=msg["role"], message=msg["content"]) for msg in messages])
     _prompt += "<|assistant|>\n"
     print(_prompt)
     return ChatFormatterResponse(prompt=_prompt)
 
 if __name__ == "__main__":
     settings = Settings(
-        model="/home/zliu/gpt/models/zephyr-7b-beta/ggml-model-Q4_K_M.gguf",
+        model="/home/zliu/gpt/models/zephyr-7b-beta/ggml-model-Q5_K_M.gguf",
         model_alias="zephyr-7b-beta",
         chat_format="zephyr",
         verbose=True,
+        cache=True,
     )
     
     app = create_app(settings=settings)
