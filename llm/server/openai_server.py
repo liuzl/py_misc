@@ -1,4 +1,5 @@
 import uvicorn
+import click
 from typing import List, Any
 from llama_cpp.server.app import create_app, Settings
 from llama_cpp import llama_types
@@ -15,17 +16,22 @@ def format_zephyr(
     print(_prompt)
     return ChatFormatterResponse(prompt=_prompt)
 
-if __name__ == "__main__":
+@click.command()
+@click.option("--model", default="zephyr-7b-beta-Q4_K_M.gguf", type=str, required=True)
+@click.option("--chat-format", default="zephyr", type=str, required=True)
+@click.option("--verbose", type=bool, default=False)
+@click.option("--cache", type=bool, default=False)
+@click.option("--port", type=int, default=2001)
+@click.option("--host", type=str, default="0.0.0.0")
+def main(model: str, chat_format: str, verbose: bool, cache: bool, port: int, host: str):
     settings = Settings(
-        model="/home/zliu/gpt/models/zephyr-7b-beta/ggml-model-Q5_K_M.gguf",
-        model_alias="zephyr-7b-beta",
-        chat_format="zephyr",
-        verbose=True,
-        cache=True,
+        model=model,
+        chat_format=chat_format,
+        verbose=verbose,
+        cache=cache,
     )
-    
     app = create_app(settings=settings)
+    uvicorn.run(app, host=host, port=port, log_level="info", reload=False)
 
-    uvicorn.run(
-        app, host="0.0.0.0", port=2001
-    )
+if __name__ == "__main__":
+    main()
