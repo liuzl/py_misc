@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Realtime ASR</title>
+  <link rel="stylesheet" href="chota.min.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+  
+  <div class="container">
+
+    <div class="hero is-full-screen">
+      <div class="logo is-vertical-align">
+        <h3>A <strong>multilingual</strong> ASR playground</h3>
+        <details>
+          <summary>Configurations</summary>
+          <label for="apiKey">apiKey</label><input id="apiKey" type="text" placeholder="input your apiKey here" />
+          <label for="endPoint">endPoint</label><input id="endPoint" type="text" placeholder="websocket address" />
+        </details>
+        <small><em>Powered by FuSearch</em></small>
+        <div id="log-box"></div>
+
+        <h3 id="timer">00:00:00</h3>
+        <div class="is-center">
+          <div id="wave">
+            <span class="wave a1"></span>
+            <span class="wave a2"></span>
+            <span class="wave a3"></span>
+            <span class="wave a4"></span>
+            <span class="wave a5"></span>
+          </div>
+        </div>
+        <div class="is-center"><img id="btn" width="80" src="stop.svg"></div>
+      </div>
+      <nav class="tabs is-center">
+        <a href="#features">features</a>
+        <a href="#start">start</a>
+        <a href="#docs">docs</a>
+        <a href="https://github.com/jenil/chota">GitHub</a>
+        <a href="javascript:void(0)" id="theme-switch" onclick="switchMode(this)">☀️</a>
+      </nav>
+    </div>
+  </div>
+
+  <script type="module" src="./webrecorder.js"></script>
+  <script type="text/javascript" src="time.js"></script>
+  <script>
+  time.init();
+  const logBox = document.querySelector('#log-box');
+const btn = document.querySelector("#btn");
+const wave = document.querySelector("#wave");
+
+  var ws = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/ws");
+  ws.binaryType = "arraybuffer";  // Important: this ensures the audio data is received as raw binary data
+  
+  // 音频上下文设置
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  // 创建一个用于播放的AudioBufferSourceNode，但不立即连接
+  let source = null;
+  
+  // 用于存储接收到的音频数据的队列
+  let audioQueue = [];
+  
+  
+  ws.onmessage = function(msg) {
+    console.info(msg)
+    let newNode = document.createElement('div');
+    newNode = document.createElement('div');
+    newNode.innerHTML = '<span style="color:red">' + msg.data + '</span>';
+    logBox.appendChild(newNode);
+  };
+  
+
+  
+  ws.onopen = function(event) {
+      console.log("WebSocket is open now.");
+  };
+  
+  ws.onclose = function(event) {
+      console.log("WebSocket is closed now.");
+  };
+  
+  
+  
+  function startRecording() {
+  
+      const recorder = new WebRecorder();
+      recorder.OnReceivedData = (data) => {
+          if (data && data.length > 0) {
+              console.log("Audio data received from recorder, "+ data.length+" bytes");
+              ws.send(data);  // Send audio data to server directly
+          }
+      }
+      recorder.start();
+      console.log("Recording started");
+  
+      /*
+      setTimeout(function() {
+          recorder.stop();
+          console.log("Recording stopped");
+      }, 3000);
+      */
+  }
+  
+  const start = function () {
+ startRecording();
+  changeStatus("start");
+}
+
+const stop = function () {
+  time.stop();
+  recorder.stop();
+  changeStatus("stop");
+}
+
+const changeStatus = (status) => {
+  if (status == "start") {
+    btn.setAttribute("src", "start.svg");
+    wave.style.display = "block";
+  } else {
+    btn.setAttribute("src", "stop.svg");
+    wave.style.display = "none";
+  }
+}
+
+btn.addEventListener("click", () => {
+  if (btn.getAttribute("src") == "stop.svg") {
+    start();
+  } else {
+    stop();
+  }
+});
+
+
+  </script>
+
+
+
+  <script>
+    if (
+      window.matchMedia &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches
+    ) {
+      document.body.classList.add("dark");
+      document.querySelector('#theme-switch').innerHTML = "🌙"
+    }
+
+    function switchMode(el) {
+      const bodyClass = document.body.classList;
+      bodyClass.contains("dark")
+        ? ((el.innerHTML = "☀️"), bodyClass.remove("dark"))
+        : ((el.innerHTML = "🌙"), bodyClass.add("dark"));
+    }
+  </script>
+</body>
+</html>
