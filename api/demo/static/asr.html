@@ -57,15 +57,6 @@ const wave = document.querySelector("#wave");
   var ws = new WebSocket(((window.location.protocol === "https:") ? "wss://" : "ws://") + window.location.host + "/ws");
   ws.binaryType = "arraybuffer";  // Important: this ensures the audio data is received as raw binary data
   
-  // 音频上下文设置
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  
-  // 创建一个用于播放的AudioBufferSourceNode，但不立即连接
-  let source = null;
-  
-  // 用于存储接收到的音频数据的队列
-  let audioQueue = [];
-  
   
   ws.onmessage = function(msg) {
     console.info(msg)

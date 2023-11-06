@@ -36,6 +36,15 @@ async def audio_sender(websocket: WebSocket, q: asyncio.Queue):
                         await websocket.send_text(item)
                         start = end
             end += duration
+            if end - start >= 60:
+                combined_data = b''.join(active_audio_data)
+                active_audio_data = []
+                inactive_count = 0
+                text = util.asr(combined_data)
+                item = json.dumps({"text": text, "start": start, "end": end}, ensure_ascii=False)
+                print(item)
+                await websocket.send_text(item)
+                start = end
             
     except WebSocketDisconnect:
         print("Client disconnected.")
@@ -59,7 +68,7 @@ async def websocket_endpoint(websocket: WebSocket):
     receiver_task = asyncio.create_task(audio_receiver(websocket, q))
     sender_task = asyncio.create_task(audio_sender(websocket, q))
     
-    done, pending = await asyncio.wait(
+    _, pending = await asyncio.wait(
         {sender_task, receiver_task}, 
         return_when=asyncio.FIRST_COMPLETED,
     )

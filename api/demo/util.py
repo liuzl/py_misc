@@ -15,7 +15,7 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 
 print(openai.api_base)
 
-vad_detector = vad.Vad(0.1)
+vad_detector = vad.Vad(0.2)
 
 
 def calculate_duration(sample_rate, pcm_data):
