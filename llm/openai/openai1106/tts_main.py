@@ -12,7 +12,7 @@ client = OpenAI()
 def stream_and_play(text):
   response = client.audio.speech.create(
     model="tts-1",
-    voice="alloy",
+    voice="shimmer",#"alloy",
     input=text,
   )
 
@@ -27,5 +27,8 @@ def stream_and_play(text):
 
 
 if __name__ == "__main__":
-  text = input("Enter text: ")
-  stream_and_play(text)
+  while True:
+    text = input("Enter text: ")
+    if text == "quit":
+      break
+    stream_and_play(text)
