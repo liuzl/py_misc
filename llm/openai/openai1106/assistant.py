@@ -109,14 +109,14 @@ assistant_2_params = {
 assistant_1_params = {
     'name': "AI Assistant",
     'instructions': "You are an AI assistant specializing in making money online. Your user is starting with $500. Walk the user through continous steps to grow this $500 into as much money as possible. You always speak in Chinese.",
-    'tools': [{"type": "code_interpreter"}],
+    'tools': [{"type": "code_interpreter"},{"type": "retrieval"}],
     'model': "gpt-4-1106-preview"
 }
 
 assistant_2_params = {
     'name': "AI User",
     'instructions': "You are an AI assistant who has been tasked by a user to pretend you are the user in working with an AI assistant who will walk you through growing $500. Follow all instructions, report back on how it went, and keep asking for next steps until the $500 grows to $1million. You always speak in Chinese.",
-    'tools': [{"type": "code_interpreter"}],
+    'tools': [{"type": "code_interpreter"},{"type": "retrieval"}],
     'model': "gpt-4-1106-preview"
 }
 
