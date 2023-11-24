@@ -37,13 +37,13 @@ audio_playback_thread = threading.Thread(target=process_audio_playback_queue)
 audio_playback_thread.start()
 
 def generate_audio(input_text, model='tts-1', voice='alloy'):
-    response = client.audio.speech.create(model=model, voice=voice, input=input_text)
-    # Convert the binary response content to a byte stream
+    response = client.audio.speech.create(model=model, voice=voice, input=input_text, speed=1.2)
     byte_stream = io.BytesIO(response.content)
     audio = AudioSegment.from_file(byte_stream, format="mp3")
     return audio
 
 def print_w_stream(message):
+    start_time = time.time()
     completion = client.chat.completions.create(
         model='gpt-3.5-turbo',
         messages=[
@@ -54,25 +54,26 @@ def print_w_stream(message):
         temperature=0, #Set to 0 for benchmarking
         max_tokens=500,
     )
-
+    print(f"Time taken: {time.time() - start_time} seconds")  # Logging time taken
     sentence = ''
     sentences = []
-    sentence_end_chars = {'.', '?', '!', '\n', '。', '！', '……', '，'}
+    sentence_end_chars = {'.', '?', '!', '\n', '。', '！', '……'}
 
     for chunk in completion:
         content = chunk.choices[0].delta.content
         if content is not None:
-            print(content, end='\n', flush=True)
+            print(content, end='', flush=True)
             for char in content:
                 sentence += char
-                if char in sentence_end_chars:
+                if len(sentence) > 5 and char in sentence_end_chars:
                     sentence = sentence.strip()
                     if sentence and sentence not in sentences:
                         sentences.append(sentence)
                         audio_generation_queue.put(sentence)
-                        print(f"Queued sentence: {sentence}")  # Logging queued sentence
+                        print(f"\nQueued sentence: {sentence}")  # Logging queued sentence
                     sentence = ''
     if sentence:
+        print(f"\nLast sentence: {sentence}")  # Logging last sentence
         audio_generation_queue.put(sentence)
     return sentences
 
