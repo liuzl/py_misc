@@ -37,7 +37,9 @@ audio_playback_thread = threading.Thread(target=process_audio_playback_queue)
 audio_playback_thread.start()
 
 def generate_audio(input_text, model='tts-1', voice='alloy'):
+    start_time = time.time()
     response = client.audio.speech.create(model=model, voice=voice, input=input_text, speed=1.2)
+    print(f"TTS time taken: {time.time() - start_time} seconds")  # Logging time taken
     byte_stream = io.BytesIO(response.content)
     audio = AudioSegment.from_file(byte_stream, format="mp3")
     return audio
