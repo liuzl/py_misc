@@ -10,7 +10,7 @@ _ = load_dotenv(find_dotenv())
 
 client = openai.OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
-    base_url=os.getenv("OPENAI_BASE_URL"),
+    base_url=os.getenv("OPENAI_API_BASE"),
 )
 
 gpt_prompt='''任务简介：

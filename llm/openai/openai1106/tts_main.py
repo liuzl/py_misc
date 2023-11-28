@@ -1,4 +1,5 @@
 import io
+import os
 from openai import OpenAI
 from pydub import AudioSegment
 from pydub.playback import play
@@ -7,7 +8,10 @@ from pydub.playback import play
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-client = OpenAI()
+client = OpenAI(
+  api_key=os.getenv("OPENAI_API_KEY"),
+  base_url=os.getenv("OPENAI_API_BASE"),
+)
 
 def stream_and_play(text):
   response = client.audio.speech.create(
