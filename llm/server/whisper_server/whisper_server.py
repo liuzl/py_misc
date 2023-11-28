@@ -6,6 +6,7 @@ from functools import lru_cache
 from typing import Optional
 from datetime import timedelta
 import numpy as np
+import time
 import whisper
 
 app = FastAPI()
@@ -59,7 +60,6 @@ async def transcriptions(model: str = Form(...),
                          prompt: Optional[str] = Form(None),
                          temperature: Optional[float] = Form(None),
                          language: Optional[str] = Form(None)):
-
     assert model == "whisper-1"
     if file is None:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Bad Request, bad file")
@@ -78,8 +78,10 @@ async def transcriptions(model: str = Form(...),
     upload_file = open(upload_name, 'wb+')
     shutil.copyfileobj(fileobj, upload_file)
     upload_file.close()
-
+    
+    start_time = time.time()
     transcript = transcribe(audio_path=upload_name, **WHISPER_DEFAULT_SETTINGS, prompt=prompt, language=language)
+    print(f"time: {time.time()-start_time} seconds")
 
     if response_format in ['text']:
         return transcript['text']
@@ -115,7 +117,7 @@ async def transcriptions(model: str = Form(...),
     return {'text': transcript['text']}
 
 @click.command()
-@click.option("--port", type=int, default=2001)
+@click.option("--port", type=int, default=38002)
 @click.option("--host", type=str, default="0.0.0.0")
 def main(port: int, host: str):
     uvicorn.run(app, host=host, port=port, log_level="info", reload=False)
