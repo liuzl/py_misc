@@ -40,7 +40,7 @@ if __name__ == "__main__":
     verbose = args.verbose
     max_num_turns = args.max_num_turns
 
-    llm = ChatLiteLLM(temperature=0.2, model_name="gpt-3.5-turbo-instruct")
+    llm = ChatLiteLLM(temperature=0.2, model_name="gpt-3.5-turbo")
 
     if config_path == "":
         print("NO")
