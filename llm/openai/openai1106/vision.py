@@ -6,7 +6,6 @@ import json
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-
 client = openai.OpenAI(
     api_key=os.getenv("OPENAI_API_KEY"),
     base_url=os.getenv("OPENAI_API_BASE"),
@@ -31,5 +30,4 @@ response = client.chat.completions.create(
     ],
     max_tokens=300,
 )
-print(response)
-#print(json.dumps(response.choices[0], ensure_ascii=False, indent=2))
+print(response.model_dump_json())
