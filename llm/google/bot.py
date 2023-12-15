@@ -53,7 +53,7 @@ def main():
             sessions[str(message.from_user.id)] = session
         else:
             session = sessions[str(message.from_user.id)]
-        print(len(session["history"])))
+        print(len(session["history"]))
         if len(session["history"]) > 20:
             session["history"] = session["history"][2:]
         if session["history"] and session["history"][-1]["role"] == "user":
