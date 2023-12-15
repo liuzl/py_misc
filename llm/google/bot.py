@@ -26,6 +26,10 @@ def chat(history: list)->str:
     if 'error' in item:
         print(item)
         return item['message']
+    if 'candidates' not in item or len(item['candidates']) == 0:
+        return "no candidates"
+    if 'content' not in item['candidates'][0]:
+        return "no content"
     reply = item['candidates'][0]['content']
     history.append(reply)
     return reply['parts'][0]['text']
