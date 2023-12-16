@@ -1,8 +1,8 @@
 import os
 import json
+import base64
 import traceback
 import requests
-from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
@@ -24,7 +24,7 @@ def new_session():
 def chat(history: list)->str:
     if history and history[-1]["role"] != "user":
         return "need user input"
-    ret = requests.post(url, json.dumps({"contents": history}), headers=headers)
+    ret = requests.post(url, json.dumps({"contents": history}, ensure_ascii=False), headers=headers)
     print(ret.json())
     item = ret.json()
     if 'error' in item:
@@ -39,8 +39,31 @@ def chat(history: list)->str:
     history.append(reply)
     return reply['parts'][0]['text']
 
-def vision():
-    pass
+def vision(prompt: str, image_data: bytes)->str:
+    data = {
+        "contents": [{
+            "parts":[{
+                "text": prompt
+            }, {
+                "inline_data": {
+                    "mime_type":"image/jpeg",
+                    "data": base64.b64encode(image_data).decode("utf-8")
+                }
+            }]
+        }]
+    }
+    ret = requests.post(url_vision, json.dumps(data, ensure_ascii=False), headers=headers)
+    print(ret.json())
+    item = ret.json()
+    if 'error' in item:
+        print(item)
+        return item['message']
+    if 'candidates' not in item or len(item['candidates']) == 0:
+        return "no candidates"
+    if 'content' not in item['candidates'][0]:
+        return "no content"
+    reply = item['candidates'][0]['content']
+    return reply['parts'][0]['text']
 
 def main():
     bot = TeleBot(os.getenv("XGOOBOT_TOKEN"))
@@ -94,8 +117,13 @@ def main():
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something is wrong with reading your image")
-        image_path = Path("gemini_temp.jpg")
-        image_data = image_path.read_bytes()
+        image_data = open("gemini_temp.jpg", "rb").read()
+        try:
+            bot.reply_to(message, vision(s, image_data))
+        except Exception as e:
+            traceback.print_exc()
+            bot.reply_to(message, "Something wrong please check the log")
+        bot.delete_message(reply_message.chat.id, reply_message.message_id)
 
 
     print("starting telegram bot.")
