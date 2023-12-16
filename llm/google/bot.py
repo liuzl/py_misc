@@ -112,14 +112,12 @@ def main():
             file_path = bot.get_file(max_size_photo.file_id).file_path
             print(file_path)
             downloaded_file = bot.download_file(file_path)
-            with open("gemini_temp.jpg", "wb") as temp_file:
-                temp_file.write(downloaded_file)
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something is wrong with reading your image")
         image_data = open("gemini_temp.jpg", "rb").read()
         try:
-            bot.reply_to(message, vision(s, image_data))
+            bot.reply_to(message, vision(s, downloaded_file))
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something wrong please check the log")
