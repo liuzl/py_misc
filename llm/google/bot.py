@@ -29,6 +29,7 @@ def chat(history: list)->str:
     if 'candidates' not in item or len(item['candidates']) == 0:
         return "no candidates"
     if 'content' not in item['candidates'][0]:
+        print(history)
         return "no content"
     reply = item['candidates'][0]['content']
     history.append(reply)
@@ -57,7 +58,8 @@ def main():
         if len(session["history"]) > 20:
             session["history"] = session["history"][2:]
         if session["history"] and session["history"][-1]["role"] == "user":
-            session["history"][-1]["parts"].append({"text": message.text})
+            #session["history"][-1]["parts"].append({"text": message.text})
+            session["history"][-1]["parts"] = [{"text": message.text}]
         else:
             session["history"].append({"role":"user", "parts":[{"text": message.text}]})
         try:
