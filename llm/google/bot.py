@@ -101,14 +101,17 @@ def main():
     @bot.message_handler(content_types=["photo"])
     def gemini_image_handler(message: Message) -> None:
         s = message.caption
-        if not s: return
+        if not s:
+            s = "Please describe the image."
         reply_message = bot.reply_to(
             message,
             "Generating google gemini vision answer please wait"
         )
         try:
-            images = [bot.download_file(bot.get_file(f.file_id).file_path) for f in message.photo]
-            print(f"{len(message.photo)} images uploaded")
+            max_size_photo = max(message.photo, key=lambda p: p.file_size)
+            file_path = bot.get_file(max_size_photo.file_id).file_path
+            print(file_path)
+            images = [bot.download_file(file_path)]
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something is wrong with reading your image")
