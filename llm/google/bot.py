@@ -24,7 +24,7 @@ def new_session():
 def chat(history: list)->str:
     if history and history[-1]["role"] != "user":
         return "need user input"
-    ret = requests.post(url, json.dumps({"contents": history}, ensure_ascii=False), headers=headers)
+    ret = requests.post(url, json.dumps({"contents": history}), headers=headers)
     print(ret.json())
     item = ret.json()
     if 'error' in item:
@@ -52,7 +52,7 @@ def vision(prompt: str, image_data: bytes)->str:
             }]
         }]
     }
-    ret = requests.post(url_vision, json.dumps(data, ensure_ascii=False), headers=headers)
+    ret = requests.post(url_vision, json.dumps(data), headers=headers)
     print(ret.json())
     item = ret.json()
     if 'error' in item:
