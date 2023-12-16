@@ -6,8 +6,8 @@ import requests
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-from telebot import TeleBot  # type: ignore
-from telebot.types import BotCommand, Message  # type: ignore
+from telebot import TeleBot
+from telebot.types import Message
 
 model = "gemini-pro"
 url = f"https://googleapis.fmr.wiki/v1beta/models/{model}:generateContent?key={os.getenv('GOOGLE_API_KEY')}"
@@ -16,10 +16,6 @@ headers = {"Content-Type": "application/json"}
 model_vision = "gemini-pro-vision"
 url_vision = f"https://googleapis.fmr.wiki/v1beta/models/{model_vision}:generateContent?key={os.getenv('GOOGLE_API_KEY')}"
 
-def new_session():
-    return {
-        "history": []
-    }
 
 def chat(history: list)->str:
     if history and history[-1]["role"] != "user":
@@ -80,7 +76,7 @@ def main():
         session = None
         # restart will lose all TODO
         if str(message.from_user.id) not in sessions:
-            session = new_session()
+            session = {"history": []}
             sessions[str(message.from_user.id)] = session
         else:
             session = sessions[str(message.from_user.id)]
