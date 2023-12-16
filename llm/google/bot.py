@@ -39,17 +39,17 @@ def chat(history: list)->str:
     history.append(reply)
     return reply['parts'][0]['text']
 
-def vision(prompt: str, image_data: bytes)->str:
+def vision(prompt: str, images: list)->str:
     data = {
         "contents": [{
             "parts":[{
                 "text": prompt
-            }, {
+            }] + [{
                 "inline_data": {
                     "mime_type":"image/jpeg",
                     "data": base64.b64encode(image_data).decode("utf-8")
                 }
-            }]
+            } for image_data in images]
         }]
     }
     ret = requests.post(url_vision, json.dumps(data), headers=headers)
@@ -71,7 +71,7 @@ def main():
     sessions = {}
 
     @bot.message_handler(regexp='(?!/).+')
-    def gemini(message: Message) -> None:
+    def gemini_chat_handler(message: Message) -> None:
         reply_message = bot.reply_to(
             message,
             "Generating google gemini answer please wait, only keep the last ten messages"
@@ -88,7 +88,6 @@ def main():
         if len(session["history"]) > 20:
             session["history"] = session["history"][2:]
         if session["history"] and session["history"][-1]["role"] == "user":
-            #session["history"][-1]["parts"].append({"text": message.text})
             session["history"][-1]["parts"] = [{"text": message.text}]
         else:
             session["history"].append({"role":"user", "parts":[{"text": message.text}]})
@@ -108,20 +107,17 @@ def main():
             "Generating google gemini vision answer please wait"
         )
         try:
-            max_size_photo = max(message.photo, key=lambda p: p.file_size)
-            file_path = bot.get_file(max_size_photo.file_id).file_path
-            print(file_path)
-            downloaded_file = bot.download_file(file_path)
+            images = [bot.download_file(bot.get_file(f.file_id).file_path) for f in message.photo]
+            print(images)
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something is wrong with reading your image")
         try:
-            bot.reply_to(message, vision(s, downloaded_file))
+            bot.reply_to(message, vision(s, images))
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something wrong please check the log")
         bot.delete_message(reply_message.chat.id, reply_message.message_id)
-
 
     print("starting telegram bot.")
     bot.infinity_polling()
