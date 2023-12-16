@@ -108,7 +108,7 @@ def main():
         )
         try:
             images = [bot.download_file(bot.get_file(f.file_id).file_path) for f in message.photo]
-            print(images)
+            print(f"{len(message.photo)} images uploaded")
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something is wrong with reading your image")
