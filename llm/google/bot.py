@@ -115,7 +115,6 @@ def main():
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something is wrong with reading your image")
-        image_data = open("gemini_temp.jpg", "rb").read()
         try:
             bot.reply_to(message, vision(s, downloaded_file))
         except Exception as e:
