@@ -2,6 +2,7 @@ import os
 import json
 import traceback
 import requests
+from pathlib import Path
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
@@ -11,6 +12,9 @@ from telebot.types import BotCommand, Message  # type: ignore
 model = "gemini-pro"
 url = f"https://googleapis.fmr.wiki/v1beta/models/{model}:generateContent?key={os.getenv('GOOGLE_API_KEY')}"
 headers = {"Content-Type": "application/json"}
+
+model_vision = "gemini-pro-vision"
+url_vision = f"https://googleapis.fmr.wiki/v1beta/models/{model_vision}:generateContent?key={os.getenv('GOOGLE_API_KEY')}"
 
 def new_session():
     return {
@@ -35,16 +39,19 @@ def chat(history: list)->str:
     history.append(reply)
     return reply['parts'][0]['text']
 
+def vision():
+    pass
+
 def main():
     bot = TeleBot(os.getenv("XGOOBOT_TOKEN"))
     print("bot init done.")
     sessions = {}
 
     @bot.message_handler(regexp='(?!/).+')
-    def gemini(message):
+    def gemini(message: Message) -> None:
         reply_message = bot.reply_to(
             message,
-            "Generating google gemini answer please wait, note, will only keep the last ten messages:"
+            "Generating google gemini answer please wait, only keep the last ten messages"
         )
         print(f"{message.from_user.id}({message.from_user.first_name}): {message.text}")
         session = None
@@ -68,7 +75,29 @@ def main():
             traceback.print_exc()
             bot.reply_to(message, "Something wrong please check the log")
         bot.delete_message(reply_message.chat.id, reply_message.message_id)
-    
+
+    @bot.message_handler(content_types=["photo"])
+    def gemini_image_handler(message: Message) -> None:
+        s = message.caption
+        if not s: return
+        reply_message = bot.reply_to(
+            message,
+            "Generating google gemini vision answer please wait"
+        )
+        try:
+            max_size_photo = max(message.photo, key=lambda p: p.file_size)
+            file_path = bot.get_file(max_size_photo.file_id).file_path
+            print(file_path)
+            downloaded_file = bot.download_file(file_path)
+            with open("gemini_temp.jpg", "wb") as temp_file:
+                temp_file.write(downloaded_file)
+        except Exception as e:
+            traceback.print_exc()
+            bot.reply_to(message, "Something is wrong with reading your image")
+        image_path = Path("gemini_temp.jpg")
+        image_data = image_path.read_bytes()
+
+
     print("starting telegram bot.")
     bot.infinity_polling()
 
