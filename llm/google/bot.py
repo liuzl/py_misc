@@ -3,6 +3,7 @@ import json
 import base64
 import traceback
 import requests
+import md2tgmd
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
@@ -87,11 +88,13 @@ def main():
             session["history"][-1]["parts"] = [{"text": message.text}]
         else:
             session["history"].append({"role":"user", "parts":[{"text": message.text}]})
+        
+        reply = chat(session["history"])
         try:
-            bot.reply_to(message, chat(session["history"]))
+            bot.reply_to(message, md2tgmd.escape(reply), parse_mode="MarkdownV2")
         except Exception as e:
             traceback.print_exc()
-            bot.reply_to(message, "Something wrong please check the log")
+            bot.reply_to(message, reply)
         bot.delete_message(reply_message.chat.id, reply_message.message_id)
 
     @bot.message_handler(content_types=["photo"])
@@ -111,11 +114,13 @@ def main():
         except Exception as e:
             traceback.print_exc()
             bot.reply_to(message, "Something is wrong with reading your image")
+        
+        reply = vision(s, images)
         try:
-            bot.reply_to(message, vision(s, images))
+            bot.reply_to(message, md2tgmd.escape(reply), parse_mode="MarkdownV2")
         except Exception as e:
             traceback.print_exc()
-            bot.reply_to(message, "Something wrong please check the log")
+            bot.reply_to(message, reply)
         bot.delete_message(reply_message.chat.id, reply_message.message_id)
 
     print("starting telegram bot.")
