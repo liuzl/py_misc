@@ -67,6 +67,12 @@ def main():
     print("bot init done.")
     sessions = {}
 
+    @bot.message_handler(commands=['start', 'clear'])
+    def handle_start(message: Message) -> None:
+        if str(message.from_user.id) in sessions:
+            sessions[str(message.from_user.id)] = {"history": []}
+        bot.reply_to(message, "Session cleared.")
+
     @bot.message_handler(regexp='(?!/).+')
     def gemini_chat_handler(message: Message) -> None:
         reply_message = bot.reply_to(
