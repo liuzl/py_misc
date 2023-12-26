@@ -12,7 +12,8 @@ client = openai.OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="gpt-4-vision-preview",
+    #model="gpt-4-vision-preview",
+    model="gemini-pro-vision",
     messages=[
         {
             "role": "user",
@@ -21,7 +22,7 @@ response = client.chat.completions.create(
                 {
                     "type": "image_url",
                     "image_url": {
-                        "url": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg",
+                        "url": "https://milo-test.oss-cn-zhangjiakou.aliyuncs.com/hdd/batch1/image007.png",
                         "detail": "low"
                     }
                 },
