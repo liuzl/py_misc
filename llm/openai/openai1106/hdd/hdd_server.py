@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import List, Union
 import uvicorn
 import click
 import os, re, json
@@ -32,13 +33,9 @@ categories = {
 回答格式（JSON），一级分类和二级分类必须与categories中定义的一致：
 ```json
 {
-    "exist": "是/否",
-    "category": {
-        "primary": "一级分类",
-        "secondary": "二级分类"
-    },
-    "freshness": "新/旧/中等",
-    "quantity": NUMBER,
+    "category": "一级分类/二级分类", //图片中物品的分类，如果是多级，会拼接到一起，比如"服装/上衣"
+    "freshness": NUMBER, //二手物品的新旧程度，0-10，10表示全新
+    "quantity": NUMBER, //对于一张图片中有多种同类的物品，给出物品的数量，比如一张图片中3本图书
     "description": "描述"
 }
 ```
@@ -47,16 +44,23 @@ categories = {
 #MODEL = "gpt-4-vision-preview"
 MODEL = "gemini-pro-vision"
 
-class Category(BaseModel):
-    primary: str
-    secondary: str
-
 class ResultDetail(BaseModel):
-    exist: str
-    category: Category | None = None
-    freshness: str | None = None
+    category: str | None = None
+    freshness: int | None = None
     quantity: int | None = None
     description: str | None = None
+
+class ImageURL(BaseModel):
+    image_url: str
+
+class ImageB64(BaseModel):
+    image_b64: str
+
+class Request(BaseModel):
+    category: str | None = None
+    description: str | None = None
+    system: str | None = None
+    images: List[Union[ImageURL, ImageB64]] = []
 
 def str_to_item(text):
     matched_content = re.search(r"```json\s([\s\S]+?)\s```", text)
@@ -79,8 +83,8 @@ def describe_multiple(images, prompt=PROMPT, model=MODEL):
         max_tokens=256,
         temperature=0.0,
     )
-    #print(response.model_dump_json())
     return response
+
 
 app = FastAPI()
 
@@ -97,9 +101,20 @@ def get_result(url: str) -> ResultDetail:
         raise HTTPException(status_code=400, detail=str(e))
     return item
 
+@app.post("/hdd/item_recognition")
+def item_recognition(item: Request) -> ResultDetail:
+    if len(item.images) == 0:
+        raise HTTPException(status_code=400, detail="images is empty")
+    try:
+        response = describe_multiple([image.image_url if type(image) == ImageURL else image.image_b64 for image in item.images])
+        item = str_to_item(response.choices[0].message.content)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    return item
+
 @click.command()
 @click.option("--host", default="0.0.0.0")
-@click.option("--port", default=9000)
+@click.option("--port", default=9001)
 @click.option("--model", default=MODEL)
 def main(host: str, port: int, model: str):
     global MODEL
