@@ -39,21 +39,13 @@ print(image_data[:100])
 response = client.chat.completions.create(
     #model="gpt-4-vision-preview",
     model="gemini-pro-vision",
-    messages=[
-        {
-            "role": "user",
-            "content": [
-                {"type": "text", "text": "What’s in this image? Please response in Chinese."},
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": image_data,
-                        "detail": "low"
-                    }
-                },
-            ],
-        }
-    ],
+    messages=[{
+        "role": "user",
+        "content": [
+            {"type": "text", "text": "What’s in this image? Please response in Chinese."},
+            {"type": "image_url", "image_url": {"url": image_data,"detail": "low"}},
+        ],
+    }],
     max_tokens=300,
 )
 print(response.model_dump_json())
