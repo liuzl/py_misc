@@ -16,7 +16,7 @@ class TailedFile:
       self._open(path, skip_to_end, offset)
       self._bufoffset = 0
       # Read in blocks of 32kb and limit the buffer to 2x this.
-      self._maxreadsize = 4096 * 8
+      self._maxreadsize = 4096 * 8 * 1024
       self._longline = False
 
    def _close(self):
