@@ -5,6 +5,14 @@ _ = load_dotenv(find_dotenv())
 from http import HTTPStatus
 import dashscope
 
+model = 'qwen-vl-plus'
+model = 'qwen-vl-max'
+
+url = "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"
+url = 'https://milo-test.oss-cn-zhangjiakou.aliyuncs.com/hdd/batch1/image009.png'
+
+prompt = "这是什么?"
+prompt = open("prompt.md", "r").read()
 
 def simple_multimodal_conversation_call():
     """Simple single round multimodal conversation call.
@@ -13,13 +21,12 @@ def simple_multimodal_conversation_call():
         {
             "role": "user",
             "content": [
-                {"image": "https://dashscope.oss-cn-beijing.aliyuncs.com/images/dog_and_girl.jpeg"},
-                {"text": "这是什么?"}
+                {"image": url},
+                {"text": prompt}
             ]
         }
     ]
-    response = dashscope.MultiModalConversation.call(model='qwen-vl-plus',
-                                                     messages=messages)
+    response = dashscope.MultiModalConversation.call(model=model, messages=messages)
     # The response status_code is HTTPStatus.OK indicate success,
     # otherwise indicate request is failed, you can get error code
     # and message from code and message.
