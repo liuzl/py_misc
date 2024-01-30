@@ -1,0 +1,5 @@
+autodistill
+autodistill-grounded-sam
+autodistill-yolov8
+roboflow
+scikit-learn
