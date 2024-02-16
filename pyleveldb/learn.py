@@ -23,3 +23,9 @@ print("="*20)
 
 for k, v in sessions[f"{user_id}:{history_key}:{now_str}":f"{user_id}:{history_key}:"]:
     print(k, v)
+
+#for i in range(1000):
+#    sessions[f"test{i}"] = i
+
+for k, v in sessions[f"1234567:":"2"]:
+    print(k, v)
