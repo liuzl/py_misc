@@ -6,7 +6,7 @@ if __name__ == "__main__":
         print(f"Usage: python {sys.argv[0]} <input_audio> <output_audio>")
         exit(1)
     # Load default model
-    model, df_state, _ = init_df()
+    model, df_state, _ = init_df("./df3")
     audio, _ = load_audio(sys.argv[1], sr=df_state.sr())
     # Denoise the audio
     enhanced = enhance(model, df_state, audio)
