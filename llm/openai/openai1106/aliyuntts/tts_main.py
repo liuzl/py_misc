@@ -8,25 +8,12 @@ from pydub.playback import play
 from dotenv import load_dotenv, find_dotenv
 _ = load_dotenv(find_dotenv())
 
-client = OpenAI(
-  api_key=os.getenv("OPENAI_API_KEY"),
-  base_url=os.getenv("OPENAI_API_BASE"),
-)
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url=os.getenv("OPENAI_API_BASE"))
 
-def stream_and_play(text):
-  response = client.audio.speech.create(
-    model="tts-1",
-    voice="zliu20240220",#"alloy",
-    input=text,
-  )
-
-  # Convert the binary response content to a byte stream
+def stream_and_play(text, voice="zliu20240220"):
+  response = client.audio.speech.create(model="tts-1", voice=voice, input=text)
   byte_stream = io.BytesIO(response.content)
-
-  # Read the audio data from the byte stream
   audio = AudioSegment.from_file(byte_stream, format="mp3")
-
-  # Play the audio
   play(audio)
 
 
