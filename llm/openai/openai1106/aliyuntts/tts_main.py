@@ -1,5 +1,4 @@
-import io
-import os
+import io, os, sys
 from openai import OpenAI
 from pydub import AudioSegment
 from pydub.playback import play
@@ -18,8 +17,11 @@ def stream_and_play(text, voice="zliu20240220"):
 
 
 if __name__ == "__main__":
+  voice = "zliu20240220"
+  if len(sys.argv) > 1:
+    voice = sys.argv[1]
   while True:
     text = input("Enter text: ")
     if text == "quit":
       break
-    stream_and_play(text)
+    stream_and_play(text, voice)
