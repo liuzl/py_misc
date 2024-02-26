@@ -16,7 +16,7 @@ client = OpenAI(
 def stream_and_play(text):
   response = client.audio.speech.create(
     model="tts-1",
-    voice="zliu",#"alloy",
+    voice="zliu20240220",#"alloy",
     input=text,
   )
 
@@ -24,7 +24,7 @@ def stream_and_play(text):
   byte_stream = io.BytesIO(response.content)
 
   # Read the audio data from the byte stream
-  audio = AudioSegment.from_file(byte_stream, format="wav")
+  audio = AudioSegment.from_file(byte_stream, format="mp3")
 
   # Play the audio
   play(audio)
