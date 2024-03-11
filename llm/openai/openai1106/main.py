@@ -12,13 +12,9 @@ client = openai.OpenAI(
 
 response = client.chat.completions.create(
     #model="gpt-3.5-turbo",
-    model="gemini-pro",
-    messages=[
-        {
-            "role": "user",
-            "content": "Hello, How are you?"
-        }
-    ],
+    #model="gemini-pro",
+    model="claude-3-sonnet-20240229",
+    messages=[{"role": "user", "content": "Hello, How are you?"}],
     max_tokens=300,
 )
 print(response.model_dump_json())
